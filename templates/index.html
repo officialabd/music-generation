@@ -1,0 +1,107 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Auto Generate Music</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.22.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 60px;
+            height: 60px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+            display: none;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar bg-warning">
+            <div class="container-fluid d-flex justify-content-center">
+                <span class="navbar-brand m-2 h1 fs-3 fw-bold"> Binary Musician </span>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <div>
+                <div class="d-flex justify-content-center">
+                    <label> Enter the duration in seconds: </label>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <input id="input_number" type="number" />
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="d-flex justify-content-center mt-3">
+                        <button id="create-music" type="button" class="btn btn-dark">Create new music</button>
+                    </div>
+                    <div class="ms-3 mt-3">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+
+                <script>
+                    $("#create-music").click(function (e) {
+                        $('div.loader').show();
+                        var num = $('#input_number').val();
+                        var request = "{\"duration\": " + num + "}";
+                        console.log(num, request);
+                        $.ajax({
+                            type: "POST",
+                            contentType: "application/json",
+                            url: "http://127.0.0.1:5000/generate",
+                            data: JSON.stringify(request),
+                            success: function (rs) {
+                                $("#music-generated").attr("src", "../static/music/" + rs);
+                                $('div.loader').hide();
+                            },
+                            error: function (err) {
+                                alert("err\n" + err);
+                            }
+                        });
+                    });
+                </script>
+            </div>
+            <div class="mt-5 d-flex justify-content-center">
+                <midi-player id="music-generated" src="" sound-font></midi-player>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
